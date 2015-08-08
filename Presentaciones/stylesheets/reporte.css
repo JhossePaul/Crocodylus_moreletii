@@ -1,0 +1,65 @@
+b, strong {
+      font-weight: bold;
+    }
+
+em {
+  font-style: italic;
+}
+
+td, th{
+    text-align: center;
+}
+
+caption{
+    font-size: 12pt;
+}
+
+table{
+    margin: 50px auto;
+}
+
+slides > slide {
+  -webkit-transition: all 0.4s ease-in-out;
+  -moz-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+
+slides > slide:not(.nobackground):before {
+  font-size: 12pt;
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 60px;
+  background: url(../../Imagenes/logo.jpg) no-repeat 0 10%;
+  -webkit-background-size: 80px 80px;
+  -moz-background-size: 80px 80px;
+  -o-background-size: 80px 80px;
+  background-size: 80px 80px;
+  padding-left: 100px;
+  height: 80px;
+  line-height: 1.9;
+}
+
+.auto-fadein {
+  -webkit-transition: opacity 0.6s ease-in;
+  -webkit-transition-delay: 0.4s;
+  -moz-transition: opacity 0.6s ease-in 0.4s;
+  -o-transition: opacity 0.6s ease-in 0.4s;
+  transition: opacity 0.6s ease-in 0.4s;
+  opacity: 0;
+}
+
+.legend{
+    float: left;
+    font-size: 10pt;
+}
+
+.protocolo{
+	color: red;
+	text-align: center;
+}
+
+#graphdiv{
+    float: left;
+}

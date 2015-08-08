@@ -1,0 +1,60 @@
+---
+title: "Cocodrilos"
+author: "Juan Saúl Baez Torreblanca"
+date: "8 de agosto de 2015"
+output:
+        ioslides_presentation:
+                css: ./stylesheets/reporte.css
+                logo: ../Imagenes/logo.jpg
+                smaller: yes
+                widescreen: yes
+---
+
+## LHC con resguardo
+
+```{r paqueterias, include = F, echo = F}
+library(RColorBrewer)
+library(xts)
+library(dygraphs)
+```
+
+```{r datos, echo = F}
+# Limpieza de datos
+LHC = read.csv("../Datos/Tidy/LHC.csv")
+ID = LHC[, 1:5]
+LHC = t(LHC[, -(1:5)])
+colnames(LHC) = ID$MARCA
+LHC = xts(LHC,
+          order.by = seq.Date(from = as.Date("2015-01-200"),
+                              by = "months", length.out = 6)
+          )
+```
+
+<div id="graphdiv">
+```{r LHC CR, echo = F}
+dygraph(data = LHC[, ID$Resguardo == "CR"], width = 700, height = 400,
+        main = "LHC", xlab = paste("Tina:", 1), group = "LHC") %>%
+        dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
+        dyLegend(labelsSeparateLines = T, labelsDiv = "LHCCR") %>% 
+        dyAxis("x", rangePad = 20) %>%
+        dyOptions(drawPoints = T, pointSize = 2)
+```
+</div>
+
+<div id="LHCCR", class="legend">
+</div>
+
+## LHC sin resguardo
+<div id="graphdiv">
+```{r LHC SR, echo = F}
+dygraph(data = LHC[, ID$Resguardo == "SR"], width = 700, height = 400,
+        main = "LHC", xlab = paste("Tina:", 2), group = "LHC") %>%
+        dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
+        dyLegend(width = 500, labelsDiv = "LHCSR", labelsSeparateLines = T) %>% 
+        dyAxis("x", rangePad = 20) %>%
+        dyOptions(drawPoints = T, pointSize = 2)
+```
+</div>
+
+<div id="LHCSR", class="legend">
+</div>
