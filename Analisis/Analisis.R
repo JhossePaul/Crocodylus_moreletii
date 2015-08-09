@@ -4,12 +4,14 @@
 ################################################################################
 ## Análisis de datos por Biol. Jhosse Paul Márquez Ruíz
 # Paqueterias ####
+library(Matrix)
 library(RColorBrewer)
 library(dplyr)
 library(xts)
 library(dygraphs)
 library(reshape2)
 library(rCharts)
+library(nlme)
 
 # Limpieza de datos
 LHC = read.csv("./Datos/Tidy/LHC.csv")
@@ -38,13 +40,11 @@ LHC$Resguardo = as.factor(rep(ID$Resguardo, each = 6))
 LHC$Silvestre = as.factor(rep(ID$Silvestre, each = 6))
 names(LHC)[1:2] = c("Marca", "LHC")
 LHC$Marca = as.factor(LHC$Marca)
-LHC$Tiempo = rep(seq.Date(as.Date("2015-01-20"), by = "months", length.out = 6), 64)
-
-x11(); boxplot(LHC ~ Marca, data = LHC, col = ID$Resguardo)
-
+LHC$Tiempo = rep(1:6, 64)
+seq.Date(as.Date("2015-01-20"), by = "months", length.out = 6)
 
 
+model = lmer(LHC ~ Tiempo + Resguardo + (1| Tina/Marca), data = LHC, REML = F)
+plot(model)
 
-
-
-lmer
+summary(lm(LHC ~ Tiempo + Resguardo, data = LHC))
