@@ -12,6 +12,7 @@ library(dygraphs)
 library(reshape2)
 library(rCharts)
 library(nlme)
+library(ggplot2)
 
 # Limpieza de datos
 LHC = read.csv("./Datos/Tidy/LHC.csv")
@@ -41,10 +42,16 @@ LHC$Silvestre = as.factor(rep(ID$Silvestre, each = 6))
 names(LHC)[1:2] = c("Marca", "LHC")
 LHC$Marca = as.factor(LHC$Marca)
 LHC$Tiempo = rep(1:6, 64)
-seq.Date(as.Date("2015-01-20"), by = "months", length.out = 6)
+LHC$TinaGrande = as.factor(LHC$Tina)
+levels(LHC$TinaGrande) = rep(1:4, each = 3)
 
 
-model = lmer(LHC ~ Tiempo + Resguardo + (1| Tina/Marca), data = LHC, REML = F)
-plot(model)
+model = lme(fixed = LHC ~ Tiempo + Resguardo, random = ~ 1| TinaGrande/Tina, data  = LHC, na.action = na.exclude)
+summary(model)
 
-summary(lm(LHC ~ Tiempo + Resguardo, data = LHC))
+ggplot(LHC, aes(x = factor(Marca), y = LHC)) +
+        facet_grid(. ~ TinaGrande + Tina, scales = "free") +
+        geom_boxplot(aes(color = factor(Resguardo))) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        labs(title = "Longitud Hocico-Cloca") +
+        labs(x = "Marca", y = "LHC", color = "Resguardo")
