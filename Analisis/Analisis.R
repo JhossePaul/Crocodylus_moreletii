@@ -46,7 +46,8 @@ LHC$TinaGrande = as.factor(LHC$Tina)
 levels(LHC$TinaGrande) = rep(1:4, each = 3)
 
 
-model = lme(fixed = LHC ~ Tiempo + Resguardo, random = ~ 1| TinaGrande/Tina, data  = LHC, na.action = na.exclude)
+model = lme(fixed = LHC ~ Tiempo + Resguardo, random = ~ 1| TinaGrande/Tina/Marca,
+            data  = LHC, na.action = na.exclude, method = "ML")
 summary(model)
 
 ggplot(LHC, aes(x = factor(Marca), y = LHC)) +
