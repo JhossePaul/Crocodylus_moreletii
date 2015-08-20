@@ -10,16 +10,20 @@ output:
                 widescreen: yes
 ---
 
-## LHC con resguardo
+## Crecimiento de LHC
 
 ```{r paqueterias, include = F, echo = F}
-library(RColorBrewer)
+library(dplyr)
 library(xts)
 library(dygraphs)
+library(reshape2)
+library(rCharts)
+library(lme4)
+library(stargazer)
+library(ggplot2)
 ```
 
 ```{r datos, echo = F}
-# Limpieza de datos
 LHC = read.csv("../Datos/Tidy/LHC.csv")
 ID = LHC[, 1:5]
 LHC = t(LHC[, -(1:5)])
@@ -32,8 +36,8 @@ LHC = xts(LHC,
 
 <div id="graphdiv">
 ```{r LHC CR, echo = F}
-dygraph(data = LHC[, ID$Resguardo == "CR"], width = 700, height = 400,
-        main = "LHC", xlab = paste("Tina:", 1), group = "LHC") %>%
+dygraph(data = LHC[, ID$Resguardo == "CR"], width = 400, height = 300,
+        main = "Con Resguardo", group = "LHC") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "LHCCR") %>% 
         dyAxis("x", rangePad = 20) %>%
@@ -43,12 +47,11 @@ dygraph(data = LHC[, ID$Resguardo == "CR"], width = 700, height = 400,
 
 <div id="LHCCR", class="legend">
 </div>
-
-## LHC sin resguardo
+        
 <div id="graphdiv">
 ```{r LHC SR, echo = F}
-dygraph(data = LHC[, ID$Resguardo == "SR"], width = 700, height = 400,
-        main = "LHC", xlab = paste("Tina:", 2), group = "LHC") %>%
+dygraph(data = LHC[, ID$Resguardo == "SR"], width = 400, height = 300,
+        main = "Sin Resguardo", group = "LHC") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(width = 500, labelsDiv = "LHCSR", labelsSeparateLines = T) %>% 
         dyAxis("x", rangePad = 20) %>%
@@ -58,3 +61,35 @@ dygraph(data = LHC[, ID$Resguardo == "SR"], width = 700, height = 400,
 
 <div id="LHCSR", class="legend">
 </div>
+
+## Comparación de los grupos
+
+```{r limpieza_LHC_2, echo = F, include = F}
+muertos = apply(LHC, 2, function(x) length(na.omit(x))) == 0
+LHC = melt(as.data.frame(LHC))
+LHC$Tina = factor(rep(ID[!muertos, "Tina"], each = 6))
+LHC$Resguardo = factor(rep(ID[!muertos, "Resguardo"], each = 6))
+LHC$Silvestre = factor(rep(ID[!muertos, "Silvestre"], each = 6))
+names(LHC)[1:2] = c("Marca", "LHC")
+LHC$Marca = factor(LHC$Marca)
+LHC$Tiempo = rep(1:6, length(unique(LHC$Marca)))
+LHC$TinaGrande = factor(LHC$Tina)
+levels(LHC$TinaGrande) = rep(1:4, each = 3)
+```
+
+```{r ggplot_LHC, echo = F, fig.align = "center", fig.width = 10}
+ggplot(na.omit(LHC), aes(x = factor(Marca), y = LHC)) +
+        facet_grid(. ~ TinaGrande + Tina, scales = "free") +
+        geom_boxplot(aes(color = factor(Resguardo))) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        labs(title = "Longitud Hocico-Cloca") +
+        labs(x = "Marca", y = "LHC", color = "Resguardo")
+```
+
+## Modelo lineal de efectos mixtos
+
+```{r, echo = F, comment = NA, results="asis"}
+model = lmer(LHC ~ Resguardo + (1|TinaGrande/Tina/Marca), data = LHC)
+stargazer(model)
+# summary(model)
+```

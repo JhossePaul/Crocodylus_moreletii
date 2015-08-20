@@ -304,6 +304,11 @@ Version: 0.2.5
 Hash: b0dc8e47269dd486bf853b2f3960b732
 Requires: RColorBrewer, Rcpp, dichromat, labeling, munsell, plyr
 
+Package: stargazer
+Source: CRAN
+Version: 5.2
+Hash: fc843e7cc51afa4f540fc3c3355fe2a7
+
 Package: stringi
 Source: CRAN
 Version: 0.5-5
