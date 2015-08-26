@@ -1,7 +1,7 @@
 ---
-title: "Cocodrilos"
+title: "Evaluación del crecimiento en cautiverio de _Crocodylus moreletii_ en ausencia de refugio"
 author: "Juan Saúl Baez Torreblanca"
-date: "8 de agosto de 2015"
+date: "`r Sys.Date()`"
 output:
         ioslides_presentation:
           css: ./stylesheets/reporte.css
@@ -12,55 +12,20 @@ output:
 ---
 
 ```{r paqueterias, include = F, echo = F}
-library(dplyr)
-library(xts)
 library(dygraphs)
-library(reshape2)
-library(rCharts)
-library(lme4)
-library(stargazer)
 library(ggplot2)
+library(stargazer)
 ```
 
 # Data Loggers
-```{r Data_Loggers, echo = F}
-Tina1 = read.csv("../Datos/Tidy/SBT data loggers/1174337.csv", skip = 1)
-Tina2 = read.csv("../Datos/Tidy/SBT data loggers/1296583.csv", skip = 1)
-Tina3 = read.csv("../Datos/Tidy/SBT data loggers/1296588.csv", skip = 1)
-Tina4 = read.csv("../Datos/Tidy/SBT data loggers/2271278.csv", skip = 1)
-Ambiental = read.csv("../Datos/Tidy/SBT data loggers/1296589.csv",
-                     skip = 1)
-Tina1 = xts(Tina1[, 3:4],
-            as.POSIXct(Tina1[, 2],
-                       format = "%m/%d/%Y %H:%M:%S %p"))
-Tina2 = xts(Tina2[, 3:4],
-            as.POSIXct(Tina2[, 2],
-                       format = "%m/%d/%Y %H:%M:%S %p"))
-Tina3 = xts(Tina3[, 3:4],
-            as.POSIXct(Tina3[, 2], 
-                       format = "%m/%d/%Y %H:%M:%S %p"))
-Tina4 = xts(Tina4[, 3:4],
-            as.POSIXct(Tina4[, 2],
-                       format = "%m/%d/%Y %H:%M:%S %p"))
-Ambiental = xts(Ambiental[, 3:4],
-                as.POSIXct(Ambiental[, 2],
-                           format = "%m/%d/%Y %H:%M:%S %p"))
-
-Temp = cbind(Tina1[, 1], Tina2[, 1], Tina3[, 1], Tina4[, 1],
-             Ambiental[, 1])
-Luz =  cbind(Tina1[, 2], Tina2[, 2], Tina3[, 2], Tina4[, 2],
-             Ambiental[, 2])
-Temp = apply.daily(Temp, mean, na.rm = T)
-Luz = apply.daily(Luz, mean, na.rm = T)
-names(Temp) = names(Luz) = c("Tina 1", "Tina 2", "Tina 3", "Tina 4",
-                             "Ambiental")
-
+```{r Data_Loggers, echo = FALSE, include = FALSE}
+source("../Analisis/Data_Loggers.R")
 ```
 
 ## Temperatura
 <div id="graphdiv">
 ```{r dygraph_temperatura, echo = FALSE}
-dygraph(Temp, main = "Temperatura") %>%
+dygraph(Temp) %>%
         dyRoller(rollPeriod = 1) %>% 
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "DLTemp")
@@ -73,7 +38,7 @@ dygraph(Temp, main = "Temperatura") %>%
 ## Luz
 <div id="graphdiv">
 ```{r dygraph_luz, echo = FALSE}
-dygraph(Luz, main = "Luz") %>%
+dygraph(Luz) %>%
         dyRoller(rollPeriod = 7) %>% 
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "DLLuz")
@@ -83,24 +48,18 @@ dygraph(Luz, main = "Luz") %>%
 <div id="DLLuz", class="legend">
 </div>
 
-# LHC
+
+# Longitud Hocico-Cola
 
 ## Crecimiento
 
-```{r Datos_LHC, echo = F}
-LHC = read.csv("../Datos/Tidy/LHC.csv")
-ID = LHC[, 1:5]
-LHC = t(LHC[, -(1:5)])
-colnames(LHC) = ID$MARCA
-LHC = xts(LHC,
-          order.by = seq.Date(from = as.Date("2015-01-200"),
-                              by = "months", length.out = 6)
-          )
+```{r Datos_LHC, echo = F, include = FALSE}
+source("../Analisis/Analisis_LHC.R")
 ```
 
 <div id="graphdiv">
 ```{r LHC CR, echo = F}
-dygraph(data = LHC[, ID$Resguardo == "CR"], width = 400, height = 300,
+dygraph(data = LHC_XTS[, ID$Resguardo == "CR"], width = 400, height = 300,
         main = "Con Resguardo", group = "LHC") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "LHCCR",
@@ -109,13 +68,13 @@ dygraph(data = LHC[, ID$Resguardo == "CR"], width = 400, height = 300,
         dyOptions(drawPoints = T, pointSize = 2)
 ```
 </div>
-
+        
 <div id="LHCCR", class="legend">
 </div>
         
 <div id="graphdiv">
 ```{r LHC SR, echo = F}
-dygraph(data = LHC[, ID$Resguardo == "SR"], width = 400, height = 300,
+dygraph(data = LHC_XTS[, ID$Resguardo == "SR"], width = 400, height = 300,
         main = "Sin Resguardo") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(width = 500, labelsDiv = "LHCSR", show = "onmouseover",
@@ -124,27 +83,15 @@ dygraph(data = LHC[, ID$Resguardo == "SR"], width = 400, height = 300,
         dyOptions(drawPoints = T, pointSize = 2)
 ```
 </div>
-
+        
 <div id="LHCSR", class="legend">
 </div>
-
+        
 ## Comparación de los grupos
-
-```{r limpieza_LHC_2, echo = F, include = F}
-muertos = apply(LHC, 2, function(x) length(na.omit(x))) == 0
-LHC = melt(as.data.frame(LHC))
-LHC$Tina = factor(rep(ID[!muertos, "Tina"], each = 6))
-LHC$Resguardo = factor(rep(ID[!muertos, "Resguardo"], each = 6))
-LHC$Silvestre = factor(rep(ID[!muertos, "Silvestre"], each = 6))
-names(LHC)[1:2] = c("Marca", "LHC")
-LHC$Marca = factor(LHC$Marca)
-LHC$Tiempo = rep(1:6, length(unique(LHC$Marca)))
-LHC$TinaGrande = factor(LHC$Tina)
-levels(LHC$TinaGrande) = rep(1:4, each = 3)
-```
+        
 
 ```{r ggplot_LHC, echo = F, fig.align = "center", fig.width = 10}
-ggplot(na.omit(LHC), aes(x = factor(Marca), y = LHC)) +
+ggplot(na.omit(Datos), aes(x = factor(MARCA), y = LHC)) +
         facet_grid(. ~ TinaGrande + Tina, scales = "free") +
         geom_boxplot(aes(color = factor(Resguardo))) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -155,8 +102,7 @@ ggplot(na.omit(LHC), aes(x = factor(Marca), y = LHC)) +
 ## Comparación en la LHC
 
 ```{r Comparacion_LHC, echo = F, comment = NA, results="asis"}
-model = lmer(LHC ~ Resguardo + (1|TinaGrande/Tina/Marca), data = LHC)
-stargazer(model, type = "html", style = "all",
+stargazer(model_LHC, type = "html", style = "all",
           title = "Modelo lineal de efectos mixtos", 
           dep.var.caption = "Variable Dependiente",
           dep.var.labels = "Longitud Hocico-Cola",
@@ -165,24 +111,18 @@ stargazer(model, type = "html", style = "all",
           intercept.bottom = F)
 ```
 
+
 # Circunferencia de la Cola
 
 ## Crecimiento
 
 ```{r Datos_Cola, echo = F}
-Cola = read.csv("../Datos/Tidy/Cola.csv")
-ID = Cola[, 1:4]
-Cola = t(Cola[, -(1:4)])
-colnames(Cola) = ID$MARCA
-Cola = xts(Cola,
-          order.by = seq.Date(from = as.Date("2015-01-200"),
-                              by = "months", length.out = 6)
-)
+source("../Analisis/Analisis_Cola.R")
 ```
 
 <div id="graphdiv">
 ```{r dygraph_ColaCR, echo = F}
-dygraph(data = Cola[, ID$Resguardo == "CR"], width = 400, height = 300,
+dygraph(data = Cola_XTS[, ID$Resguardo == "CR"], width = 400, height = 300,
         main = "Con Resguardo", group = "Cola") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "ColaCR",
@@ -191,13 +131,13 @@ dygraph(data = Cola[, ID$Resguardo == "CR"], width = 400, height = 300,
         dyOptions(drawPoints = T, pointSize = 2)
 ```
 </div>
-
+        
 <div id="ColaCR", class="legend">
 </div>
         
 <div id="graphdiv">
 ```{r dygraph_ColaSR, echo = F}
-dygraph(data = Cola[, ID$Resguardo == "SR"], width = 400, height = 300,
+dygraph(data = Cola_XTS[, ID$Resguardo == "SR"], width = 400, height = 300,
         main = "Sin Resguardo") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(width = 500, labelsDiv = "ColaSR", show = "onmouseover",
@@ -206,28 +146,14 @@ dygraph(data = Cola[, ID$Resguardo == "SR"], width = 400, height = 300,
         dyOptions(drawPoints = T, pointSize = 2)
 ```
 </div>
-
+        
 <div id="ColaSR", class="legend">
 </div>
-
+        
 ## Comparación de los grupos
-
-```{r Limpieza_Cola, echo = F, include = F}
-muertos = apply(Cola, 2, function(x) length(na.omit(x))) == 0
-Cola = melt(as.data.frame(Cola))
-
-Cola$Tina = factor(rep(ID[!muertos, "Tina"], each = 6))
-Cola$Resguardo = factor(rep(ID[!muertos, "Resguardo"], each = 6))
-Cola$Silvestre = factor(rep(ID[!muertos, "Silvestre"], each = 6))
-names(Cola)[1:2] = c("Marca", "Cola")
-Cola$Marca = factor(Cola$Marca)
-Cola$Tiempo = rep(1:6, length(unique(Cola$Marca)))
-Cola$TinaGrande = factor(Cola$Tina)
-levels(Cola$TinaGrande) = rep(1:4, each = 3)
-```
-
+        
 ```{r ggplot_Cola, echo = F, fig.align = "center", fig.width = 10}
-ggplot(na.omit(Cola), aes(x = factor(Marca), y = Cola)) +
+ggplot(na.omit(Datos), aes(x = factor(MARCA), y = COLA)) +
         facet_grid(. ~ TinaGrande + Tina, scales = "free") +
         geom_boxplot(aes(color = factor(Resguardo))) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -238,8 +164,7 @@ ggplot(na.omit(Cola), aes(x = factor(Marca), y = Cola)) +
 ## Comparación en la circunferencia de la cola
 
 ```{r Comparacion_Cola, echo = F, comment = NA, results="asis"}
-model = lmer(Cola ~ Resguardo + (1|TinaGrande/Tina/Marca), data = Cola)
-stargazer(model, type = "html", style = "all",
+stargazer(model_COLA, type = "html", style = "all",
           title = "Modelo lineal de efectos mixtos", 
           dep.var.caption = "Variable Dependiente",
           dep.var.labels = "Longitud de la cola",
@@ -254,18 +179,12 @@ stargazer(model, type = "html", style = "all",
 ## Crecimiento
 
 ```{r Datos_Peso, echo = F}
-Peso = read.csv("../Datos/Tidy/Peso.csv")
-ID = Peso[, 1:4]
-Peso = t(Peso[, -(1:4)])
-colnames(Peso) = ID$MARCA
-Peso = xts(Peso,
-           order.by = seq.Date(from = as.Date("2015-01-200"),
-                               by = "months", length.out = 6))
+source("../Analisis/Analisis_Peso.R")
 ```
 
 <div id="graphdiv">
 ```{r dygraph_PesoCR, echo = F}
-dygraph(data = Peso[, ID$Resguardo == "CR"], width = 400, height = 300,
+dygraph(data = Peso_XTS[, ID$Resguardo == "CR"], width = 400, height = 300,
         main = "Con Resguardo", group = "Peso") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(labelsSeparateLines = T, labelsDiv = "PesoCR",
@@ -274,13 +193,13 @@ dygraph(data = Peso[, ID$Resguardo == "CR"], width = 400, height = 300,
         dyOptions(drawPoints = T, pointSize = 2)
 ```
 </div>
-        
+
 <div id="PesoCR", class="legend">
 </div>
-        
+
 <div id="graphdiv">
 ```{r dygraph_PesoSR, echo = F}
-dygraph(data = Peso[, ID$Resguardo == "SR"], width = 400, height = 300,
+dygraph(data = Peso_XTS[, ID$Resguardo == "SR"], width = 400, height = 300,
         main = "Sin Resguardo") %>%
         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
         dyLegend(width = 500, labelsDiv = "PesoSR", show = "onmouseover",
@@ -293,22 +212,13 @@ dygraph(data = Peso[, ID$Resguardo == "SR"], width = 400, height = 300,
 </div>
 
 ## Comparación de los grupos
-        
+
 ```{r Limpieza_Peso, echo = F, include = F}
-muertos = apply(Peso, 2, function(x) length(na.omit(x))) == 0
-Peso = melt(as.data.frame(Peso))
-Peso$Tina = factor(rep(ID[!muertos, "Tina"], each = 6))
-Peso$Resguardo = factor(rep(ID[!muertos, "Resguardo"], each = 6))
-Peso$Silvestre = factor(rep(ID[!muertos, "Silvestre"], each = 6))
-names(Peso)[1:2] = c("Marca", "Peso")
-Peso$Marca = factor(Peso$Marca)
-Peso$Tiempo = rep(1:6, length(unique(Peso$Marca)))
-Peso$TinaGrande = factor(Peso$Tina)
-levels(Peso$TinaGrande) = rep(1:4, each = 3)
+source("../Analisis/Analisis_Peso.R")
 ```
 
 ```{r ggplot_Peso, echo = F, fig.align = "center", fig.width = 10}
-ggplot(na.omit(Peso), aes(x = factor(Marca), y = Peso)) +
+ggplot(na.omit(Datos), aes(x = factor(MARCA), y = PESO)) +
         facet_grid(. ~ TinaGrande + Tina, scales = "free") +
         geom_boxplot(aes(color = factor(Resguardo))) +
         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -319,8 +229,7 @@ ggplot(na.omit(Peso), aes(x = factor(Marca), y = Peso)) +
 ## Comparación en la longitud de la Peso
 
 ```{r Comparacion_Peso, echo = F, comment = NA, results="asis"}
-model = lmer(Peso ~ Resguardo + (1|TinaGrande/Tina/Marca), data = Peso)
-stargazer(model, type = "html", style = "all",
+stargazer(model_Peso, type = "html", style = "all",
           title = "Modelo lineal de efectos mixtos", 
           dep.var.caption = "Variable Dependiente",
           dep.var.labels = "Longitud de la Peso",

@@ -10,7 +10,7 @@ library(dygraphs)
 library(nlme)
 library(lme4)
 
-Datos = read.csv("./Datos/Tidy/Datos.csv")
+Datos = read.csv("../Datos/Tidy/Datos.csv")
 LHC = dcast(Datos, TinaGrande + Tina + MARCA + Resguardo + Silvestre ~ Fecha,
             value.var = "LHC")
 
