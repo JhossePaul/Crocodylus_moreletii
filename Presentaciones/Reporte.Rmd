@@ -1,5 +1,6 @@
 ---
 title: "Evaluación del crecimiento en cautiverio de _Crocodylus moreletii_ en ausencia de refugio"
+subtitle: "Elaborado por Jhosse Paul Márquez Ruíz"
 author: "Juan Saúl Baez Torreblanca"
 date: "`r Sys.Date()`"
 output:
