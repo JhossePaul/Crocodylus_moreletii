@@ -1,0 +1,54 @@
+---
+title: "Evaluación del crecimiento en cautiverio de _Crocodylus moreletii_ en ausencia de refugio"
+subtitle: "Elaborado por Jhosse Paul Márquez Ruíz"
+author: "Juan Saúl Baez Torreblanca"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+# Analisis
+
+Se llevaron a cabo 3 pruebas de T de Student para compara la media entre ambas
+poblaciones
+
+```{r librerias, echo = F, include = F}
+library(schoRsch)
+library(xtable)
+library(gridExtra)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+```{r data, echo = F, comment = ""}
+DATA = read.csv("~/Repositorios/Crocodylus_moreletii/Datos/Tidy/Crecimiento.csv")
+```
+
+## Resultados
+
+Los datos analizados tienen las siguientes características
+
+```{r, echo = F, comment = ""}
+summary(DATA)
+```
+
+### Comparación entre crecimiento de longitud hocico-cloaca
+
+```{r t_test_LHC, echo = F, comment = ""}
+t.test(LHC ~ Refugio, data = DATA)
+ggplot(DATA, aes(x = Refugio, y = LHC)) + geom_boxplot()
+```
+
+### Comparación entre crecimiento de longitud de la cola
+
+```{r t_test_cola, echo = F, comment = ""}
+t.test(Cola ~ Refugio, data = DATA)
+ggplot(DATA, aes(x = Refugio, y = Cola)) + geom_boxplot()
+```
+
+### Comparación entre el cambio de peso
+
+```{r t_test_peso, echo = F, comment = ""}
+t.test(Peso ~ Refugio, data = DATA)
+ggplot(DATA, aes(x = Refugio, y = Peso)) + geom_boxplot()
+```
